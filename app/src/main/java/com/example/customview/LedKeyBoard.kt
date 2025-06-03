@@ -1,13 +1,9 @@
 package com.example.customview
 
-import android.graphics.Typeface
-import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -17,22 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -129,8 +121,6 @@ fun KeyboardDemoScreen() {
         KeyboardWithColorWaveText()
     }
 }
-
-
 
 
 //anima color keyboard
@@ -261,7 +251,6 @@ fun KeyboardDemo2() {
 }
 
 
-
 //anima color keyboard 2
 @Composable
 fun RadialColorWaveKeyboard() {
@@ -357,8 +346,7 @@ fun KeyboardKey(
 }
 
 
-
-
+//anim color Keyboard 333
 @Composable
 fun RadialSmoothColorKeyboard() {
     val keyboardRows = listOf(
@@ -410,8 +398,10 @@ fun RadialSmoothColorKeyboard() {
                         val angle = atan2(dy, dx) // Góc trong khoảng -π đến π
 
                         // Tính màu dựa trên góc và tiến trình animation
-                        val normalizedAngle = (angle + PI).toFloat() / (2f * PI.toFloat()) // Chuẩn hóa về 0-1
-                        val colorProgress = (waveProgress / (2f * PI.toFloat()) + normalizedAngle + distance * 0.05f) % 1f
+                        val normalizedAngle =
+                            (angle + PI).toFloat() / (2f * PI.toFloat()) // Chuẩn hóa về 0-1
+                        val colorProgress =
+                            (waveProgress / (2f * PI.toFloat()) + normalizedAngle + distance * 0.05f) % 1f
                         val color = lerpGradient(colorStops, colorProgress)
 
                         // Hiệu ứng phát sáng cho phím gần tâm
@@ -489,3 +479,362 @@ fun lerpGradient(colorStops: List<Pair<Float, Color>>, progress: Float): Color {
 }
 
 
+//anim color keyboard 444
+@Composable
+fun KeyboardWithMovingBackgroundText() {
+    val keyboardRows = listOf(
+        listOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"),
+        listOf("A", "S", "D", "F", "G", "H", "J", "K", "L"),
+        listOf("Z", "X", "C", "V", "B", "N", "M"),
+        listOf("Ctrl", "Win", "Alt", "Space", "Alt", "Fn", "Ctrl")
+    )
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val progress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+
+    // Màu sắc chuyển động
+    val colors = listOf(
+        Color(0xFFFF0000), // Red
+        Color(0xFFFF00FF), // Magenta
+        Color(0xFF0000FF), // Blue
+        Color(0xFF00FFFF), // Cyan
+        Color(0xFF00FF00), // Green
+        Color(0xFFFFFF00), // Yellow
+        Color(0xFFFF0000)  // Red (lặp lại)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Black)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // Lớp nền chạy màu (ẩn bên dưới, chỉ hiện qua chữ)
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(200.dp)
+//                .align(Alignment.BottomCenter)
+//                .drawWithContent {
+//                    val gradientWidth = size.width * 2
+//                    val offsetX = -size.width + progress * gradientWidth
+//
+//                    drawRect(
+//                        brush = Brush.linearGradient(
+//                            colors = colors,
+//                            start = Offset(offsetX, 0f),
+//                            end = Offset(offsetX + gradientWidth, 0f)
+//                        ),
+//                        size = size
+//                    )
+//                }
+//        )
+
+        // Bàn phím - chỉ chữ hiển thị màu chuyển động
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            keyboardRows.forEach { row ->
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    row.forEach { key ->
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .size(if (key.length > 2) 60.dp else 48.dp)
+                                .background(Color.Black, RoundedCornerShape(6.dp)) // Nền đen
+                                .border(1.dp, Color(0x44FFFFFF), RoundedCornerShape(6.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = key,
+                                color = Color.White, // Màu chữ trắng (sẽ bị ghi đè bởi blend mode)
+                                fontSize = if (key.length > 2) 14.sp else 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .graphicsLayer {
+                                        alpha = 0.99f
+                                        compositingStrategy = CompositingStrategy.Offscreen
+                                    }
+                                    .drawWithContent {
+                                        // 1. Vẽ chữ trắng lên layer
+                                        drawContent()
+
+                                        // 2. Áp dụng gradient màu CHỈ lên phần chữ (dùng SrcIn)
+                                        drawRect(
+                                            brush = Brush.linearGradient(
+                                                colors = colors,
+                                                start = Offset(
+                                                    -size.width + progress * size.width * 2,
+                                                    0f
+                                                ),
+                                                end = Offset(progress * size.width * 2, 0f)
+                                            ),
+                                            blendMode = BlendMode.SrcIn // Chỉ giữ lại màu ở phần chữ
+                                        )
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+//anim color keyboard 555
+@Composable
+fun KeyboardWithMovingBackgroundText222() {
+    val keyboardRows = listOf(
+        listOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"),
+        listOf("A", "S", "D", "F", "G", "H", "J", "K", "L"),
+        listOf("Z", "X", "C", "V", "B", "N", "M"),
+        listOf("Ctrl", "Win", "Alt", "Space", "Alt", "Fn", "Ctrl")
+    )
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val progress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+
+    // Màu sắc chuyển động
+    val colors = listOf(
+        Color(0xFFFF0000), // Red
+        Color(0xFFFF00FF), // Magenta
+        Color(0xFF0000FF), // Blue
+        Color(0xFF00FFFF), // Cyan
+        Color(0xFF00FF00), // Green
+        Color(0xFFFFFF00), // Yellow
+        Color(0xFF8BC34A),  // Red (lặp lại)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Black)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            keyboardRows.forEach { row ->
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    row.forEach { key ->
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .size(if (key.length > 2) 60.dp else 48.dp)
+                                .background(Color.Black, RoundedCornerShape(6.dp))
+                                .drawWithContent {
+                                    // Vẽ border chuyển động
+                                    val borderWidth = 1.dp.toPx()
+                                    val gradientWidth = size.width * 2
+                                    val offsetX = -size.width + progress * gradientWidth
+
+                                    drawContent()
+
+                                    // Vẽ border gradient
+                                    drawRoundRect(
+                                        brush = Brush.linearGradient(
+                                            colors = colors,
+                                            start = Offset(offsetX, 0f),
+                                            end = Offset(offsetX + gradientWidth, 0f)
+                                        ),
+                                        topLeft = Offset.Zero,
+                                        size = size,
+                                        cornerRadius = CornerRadius(6.dp.toPx()),
+                                        style = Stroke(width = borderWidth)
+                                    )
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = key,
+                                color = Color.White,
+                                fontSize = if (key.length > 2) 14.sp else 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .graphicsLayer {
+                                        alpha = 0.99f
+                                        compositingStrategy = CompositingStrategy.Offscreen
+                                    }
+                                    .drawWithContent {
+                                        drawContent()
+                                        // Áp dụng gradient cho chữ
+                                        drawRect(
+                                            brush = Brush.linearGradient(
+                                                colors = colors,
+                                                start = Offset(
+                                                    -size.width + progress * size.width * 2,
+                                                    0f
+                                                ),
+                                                end = Offset(progress * size.width * 2, 0f)
+                                            ),
+                                            blendMode = BlendMode.SrcIn
+                                        )
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+@Composable
+fun RadialColorKeyboard() {
+    val keyboardRows = listOf(
+        listOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"),
+        listOf("A", "S", "D", "F", "G", "H", "J", "K", "L"),
+        listOf("Z", "X", "C", "V", "B", "N", "M"),
+        listOf("Ctrl", "Win", "Alt", "Space", "Alt", "Fn", "Ctrl")
+    )
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val angle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(5000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+
+    val colors = remember {
+        listOf(
+            Color(0xFFFF0000), // Red
+            Color(0xFFFF00FF), // Magenta
+            Color(0xFF0000FF), // Blue
+            Color(0xFF00FFFF), // Cyan
+            Color(0xFF00FF00), // Green
+            Color(0xFFFFFF00), // Yellow
+            Color(0xFFFF0000)  // Red (loop)
+        )
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // Lớp chứa toàn bộ bàn phím để tính toán tâm
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .drawWithContent {
+                    val center = size.center
+                    val radius = maxOf(size.width, size.height) * 0.8f
+
+                    drawContent()
+
+                    // Vẽ radial gradient cho toàn bộ khu vực
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = colors,
+                            center = center,
+                            radius = radius,
+                            angle = angle.deg,
+                            colorStops = null
+                        ),
+                        blendMode = BlendMode.SrcIn
+                    )
+                }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                keyboardRows.forEach { row ->
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        row.forEach { key ->
+                            KeyButton(
+                                text = key,
+                                colors = colors,
+                                angle = angle
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun KeyButton(
+    text: String,
+    colors: List<Color>,
+    angle: Float
+) {
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+            .size(if (text.length > 2) 60.dp else 48.dp)
+            .background(Color.Black, RoundedCornerShape(6.dp))
+            .border(
+                width = 1.dp,
+                brush = Brush.radialGradient(
+                    colors = colors,
+                    center = Offset.Unspecified,
+                    radius = 100f,
+                    angle = angle.deg
+                ),
+                shape = RoundedCornerShape(6.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = if (text.length > 2) 14.sp else 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .graphicsLayer {
+                    compositingStrategy = CompositingStrategy.Offscreen
+                }
+                .drawWithContent {
+                    drawContent()
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = colors,
+                            center = Offset(size.width/2, size.height/2),
+                            radius = size.minDimension * 0.8f,
+                            angle = angle.deg
+                        ),
+                        blendMode = BlendMode.SrcIn
+                    )
+                }
+        )
+    }
+}

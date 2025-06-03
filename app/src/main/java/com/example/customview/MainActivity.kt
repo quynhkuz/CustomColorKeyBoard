@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
 //            KeyboardDemo()
 
 
-            RadialSmoothColorKeyboard()
+            KeyboardWithMovingBackgroundText222()
         }
     }
 }
@@ -52,7 +52,8 @@ fun GreetingPreview() {
 //        RunningSquareExample()
 
 //        KeyboardDemo()
-        RadialSmoothColorKeyboard()
+
+        KeyboardWithMovingBackgroundText222()
 
     }
 }
