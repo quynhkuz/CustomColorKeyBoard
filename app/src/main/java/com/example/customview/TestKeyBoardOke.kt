@@ -8,81 +8,13 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.unit.dp
 import kotlin.math.cos
 import kotlin.math.sin
-
-
-@Composable
-fun GradientTextMask() {
-//    val text = "abc"
-//    val gradient = Brush.linearGradient(
-//        colors = listOf(Color.Red, Color.Blue),
-//        start = Offset(0f, 0f),
-//        end = Offset(400f, 400f)
-//    )
-
-
-//    Canvas(modifier = Modifier.size(200.dp)) {
-//        // Tạo đối tượng Paint để vẽ chữ
-//        val paint = android.graphics.Paint().apply {
-//            isAntiAlias = true
-//            textSize = 150f
-//            style = android.graphics.Paint.Style.FILL
-//            textAlign = android.graphics.Paint.Align.LEFT
-//            typeface = android.graphics.Typeface.DEFAULT_BOLD
-//        }
-//
-//        // Tính kích thước chữ để canh giữa
-//        val bounds = android.graphics.Rect()
-//        paint.getTextBounds(text, 0, text.length, bounds)
-//
-//        val textWidth = paint.measureText(text)
-//        val textHeight = bounds.height()
-//
-//        // Tọa độ để canh giữa chữ
-//        val x = (size.width - textWidth) / 2f
-//        val y = (size.height + textHeight) / 2f
-//
-//        // Dùng chế độ BlendMode.SrcIn để vẽ gradient chỉ trong vùng chữ
-//        drawIntoCanvas { canvas ->
-//            val frameworkCanvas = canvas.nativeCanvas
-//
-//            val layer = frameworkCanvas.saveLayer(null, null)
-//
-//            // Vẽ chữ (với màu trắng làm mask)
-//            paint.color = android.graphics.Color.WHITE
-//            frameworkCanvas.drawText(text, x, y, paint)
-//
-//            // Vẽ gradient lên và cắt theo mask
-//            val paintGradient = android.graphics.Paint().apply {
-//                isAntiAlias = true
-//                shader = android.graphics.LinearGradient(
-//                    0f, 0f, size.width, size.height,
-//                    intArrayOf(
-//                        android.graphics.Color.RED,
-//                        android.graphics.Color.BLUE
-//                    ),
-//                    null,
-//                    android.graphics.Shader.TileMode.CLAMP
-//                )
-//                xfermode = android.graphics.PorterDuffXfermode(
-//                    android.graphics.PorterDuff.Mode.SRC_IN
-//                )
-//            }
-//
-//            frameworkCanvas.drawRect(0f, 0f, size.width, size.height, paintGradient)
-//
-//            frameworkCanvas.restoreToCount(layer)
-//        }
-//    }
-}
 
 
 @Composable
@@ -175,78 +107,6 @@ fun KeyboardWithMovingGradient() {
 }
 
 
-
-
-
-
-@Composable
-fun AnimatedKeyboardCharactersGradient() {
-    val keyboardRows = listOf(
-        "QWERTYUIOP",
-        "ASDFGHJKL",
-        "ZXCVBNM"
-    )
-
-    val canvasWidth = 600.dp
-    val canvasHeight = 300.dp
-
-    // Animate offset
-    val infiniteTransition = rememberInfiniteTransition()
-    val animatedOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 300f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-
-    Canvas(modifier = Modifier.size(canvasWidth, canvasHeight)) {
-        val baseTextSize = 48f
-        val rowHeight = 60f
-        val charSpacing = 50f
-
-        drawIntoCanvas { canvas ->
-            val nativeCanvas = canvas.nativeCanvas
-
-            keyboardRows.forEachIndexed { rowIndex, row ->
-                val offsetX = when (rowIndex) {
-                    0 -> 0f
-                    1 -> 25f
-                    else -> 50f
-                }
-                val y = (rowIndex + 1) * rowHeight
-
-                row.forEachIndexed { i, c ->
-                    val x = offsetX + i * charSpacing
-
-                    // Gradient riêng cho mỗi chữ, offset sẽ tạo hiệu ứng động
-                    val shader = android.graphics.LinearGradient(
-                        x + animatedOffset, y,
-                        x + animatedOffset + 40f, y + 40f,
-                        intArrayOf(
-                            android.graphics.Color.RED,
-                            android.graphics.Color.YELLOW,
-                            android.graphics.Color.CYAN
-                        ),
-                        null,
-                        android.graphics.Shader.TileMode.MIRROR
-                    )
-
-                    val paint = android.graphics.Paint().apply {
-                        isAntiAlias = true
-                        textSize = baseTextSize
-                        style = android.graphics.Paint.Style.FILL
-                        typeface = android.graphics.Typeface.MONOSPACE
-                        this.shader = shader
-                    }
-
-                    nativeCanvas.drawText(c.toString(), x, y, paint)
-                }
-            }
-        }
-    }
-}
 
 
 
