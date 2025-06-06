@@ -167,10 +167,17 @@ fun RotatingColorWheel(
                     topLeft = center - Offset(radius, radius),
                     size = Size(radius * 2, radius * 2)
                 )
+
+//                drawRect(
+//                    color = color,
+//                    topLeft = center - Offset(radius, radius),
+//                    size = Size(radius * 2, radius * 2)
+//                )
             }
         }
     }
 }
+
 
 
 

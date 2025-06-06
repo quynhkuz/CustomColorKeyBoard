@@ -61,8 +61,8 @@ fun KeyboardWithMovingGradient() {
                 val offsetX = when (rowIndex) {
                     0 -> 0f
                     1 -> 0f
-                    2 -> 25f
-                    3 -> 50f
+                    2 -> 70f
+                    3 -> 130f
                     else -> 0f
                 }
                 val y = (rowIndex + 1) * rowHeight
@@ -98,8 +98,33 @@ fun KeyboardWithMovingGradient() {
                 xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
             }
 
-            // Vẽ gradient phủ toàn bộ canvas, nhưng chỉ hiển thị trong vùng chữ do SRC_IN
-            frameworkCanvas.drawRect(0f, 0f, size.width, size.height, paintGradient)
+
+
+
+//            val paintGradient = android.graphics.Paint().apply {
+//                isAntiAlias = true
+//                shader = android.graphics.SweepGradient(
+//                    centerX, centerY,  // start: tâm canvas
+//                    intArrayOf(
+//                        android.graphics.Color.RED,
+//                        android.graphics.Color.MAGENTA,
+//                        android.graphics.Color.CYAN,
+//                        android.graphics.Color.YELLOW
+//                    ),
+//                    null
+//                )
+//                xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
+//            }
+//            // Xoay shader bằng ma trận
+//            val matrix = android.graphics.Matrix().apply {
+//                // Vẽ gradient phủ toàn bộ canvas, nhưng chỉ hiển thị trong vùng chữ do SRC_IN
+//                frameworkCanvas.drawRect(0f, 0f, size.width, size.height, paintGradient)
+//            }
+//            paintGradient.shader.setLocalMatrix(matrix)
+
+
+
+
 
             frameworkCanvas.restoreToCount(layer)
         }
