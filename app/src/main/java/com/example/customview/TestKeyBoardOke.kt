@@ -1,5 +1,6 @@
 package com.example.customview
 
+import android.graphics.Matrix
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -14,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import kotlin.math.cos
+import kotlin.math.hypot
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 @Composable
@@ -34,7 +37,7 @@ fun KeyboardWithMovingGradient() {
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 4000, easing = LinearEasing),
+            animation = tween(durationMillis = 6000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         )
     )
@@ -48,13 +51,14 @@ fun KeyboardWithMovingGradient() {
             typeface = android.graphics.Typeface.DEFAULT_BOLD
         }
 
-        val rowHeight = size.width/5
-        val charSpacing = size.width/10
+        val rowHeight = size.width / 5
+        val charSpacing = size.width / 10
 
         drawIntoCanvas { canvas ->
             val frameworkCanvas = canvas.nativeCanvas
 
-            val layer = frameworkCanvas.saveLayer(null, null)
+//            val layer = frameworkCanvas.saveLayer(null, null)
+            val layer = frameworkCanvas.saveLayer(0f, 0f, size.width, size.height, null)
 
             // Vẽ chữ trắng làm mask
             keyRows.forEachIndexed { rowIndex, row ->
@@ -73,61 +77,75 @@ fun KeyboardWithMovingGradient() {
                     frameworkCanvas.drawText(letter, x, y, paint)
                 }
             }
-            val radius = size.minDimension / 2f
-            val centerX = size.width / 2f
-            val centerY = size.height / 2f
-
-            val radians = Math.toRadians(angle.toDouble())
-            val endX = centerX + radius * cos(radians).toFloat()
-            val endY = centerY + radius * sin(radians).toFloat()
-
-            val paintGradient = android.graphics.Paint().apply {
-                isAntiAlias = true
-                shader = android.graphics.LinearGradient(
-                    centerX, centerY,  // start: tâm canvas
-                    endX, endY,        // end: quay theo vòng tròn
-                    intArrayOf(
-                        android.graphics.Color.RED,
-                        android.graphics.Color.MAGENTA,
-                        android.graphics.Color.CYAN,
-                        android.graphics.Color.YELLOW
-                    ),
-                    null,
-                    android.graphics.Shader.TileMode.MIRROR
-                )
-                xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
-            }
 
 
-
-
+//            val radius = size.minDimension / 2f
+//            val centerX = size.width / 2f
+//            val centerY = size.height / 2f
+//
+//            val radians = Math.toRadians(angle.toDouble())
+//            val endX = centerX + radius * cos(radians).toFloat()
+//            val endY = centerY + radius * sin(radians).toFloat()
+//
 //            val paintGradient = android.graphics.Paint().apply {
 //                isAntiAlias = true
-//                shader = android.graphics.SweepGradient(
+//                shader = android.graphics.LinearGradient(
 //                    centerX, centerY,  // start: tâm canvas
+//                    endX, endY,        // end: quay theo vòng tròn
 //                    intArrayOf(
 //                        android.graphics.Color.RED,
 //                        android.graphics.Color.MAGENTA,
 //                        android.graphics.Color.CYAN,
 //                        android.graphics.Color.YELLOW
 //                    ),
-//                    null
+//                    null,
+//                    android.graphics.Shader.TileMode.MIRROR
 //                )
 //                xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
 //            }
-//            // Xoay shader bằng ma trận
-//            val matrix = android.graphics.Matrix().apply {
-//                // Vẽ gradient phủ toàn bộ canvas, nhưng chỉ hiển thị trong vùng chữ do SRC_IN
-//                frameworkCanvas.drawRect(0f, 0f, size.width, size.height, paintGradient)
-//            }
-//            paintGradient.shader.setLocalMatrix(matrix)
+//
+//            frameworkCanvas.drawRect(0f, 0f, size.width, size.height, paintGradient)
+//            frameworkCanvas.restoreToCount(layer)
 
 
+            var sh = android.graphics.SweepGradient(
+                0f,
+                0f,
+                intArrayOf(
+                    android.graphics.Color.RED,
+                    android.graphics.Color.MAGENTA,
+                    android.graphics.Color.YELLOW,
+                    android.graphics.Color.CYAN,
+                    android.graphics.Color.BLUE,
+                    android.graphics.Color.GREEN,
+                ),
+                null,
+            )
+
+            val matrix = Matrix()
+            matrix.postRotate(angle, 0f, 0f)
+            sh.setLocalMatrix(matrix)
+
+            val paintGradient = android.graphics.Paint().apply {
+                isAntiAlias = true
+                shader = sh
+                xfermode =
+                    android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
+            }
 
 
-
+//            frameworkCanvas.drawRect(0f, 0f, size.width, size.height, paintGradient)
+            frameworkCanvas.drawCircle(
+                0f,
+                0f,
+                2000f,
+                paintGradient
+            )
             frameworkCanvas.restoreToCount(layer)
+
         }
+
+
     }
 }
 

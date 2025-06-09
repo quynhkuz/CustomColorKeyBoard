@@ -62,4 +62,7 @@ dependencies {
     implementation ("androidx.compose.animation:animation:1.5.0")
     implementation ("androidx.compose.material3:material3:1.1.0")
 
+
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
 }

@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HomeScreen()
+//            AdsView()
 
 //            DrawCircleSample(modifier = Modifier.fillMaxSize().padding(top = 100.dp))
 
